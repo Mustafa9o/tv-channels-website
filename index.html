@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamTV - Watch Live Channels</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-tv"></i>
+                <h1>StreamTV</h1>
+            </div>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search channels...">
+            </div>
+            <div class="user-menu">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fas fa-fire"></i> Trending</a></li>
+                <li><a href="#"><i class="fas fa-star"></i> Favorites</a></li>
+                <li><a href="#"><i class="fas fa-history"></i> Recently Watched</a></li>
+                <li><a href="#"><i class="fas fa-film"></i> Movies</a></li>
+                <li><a href="#"><i class="fas fa-football-ball"></i> Sports</a></li>
+                <li><a href="#"><i class="fas fa-newspaper"></i> News</a></li>
+                <li><a href="#"><i class="fas fa-child"></i> Kids</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Video Player -->
+            <div class="video-player">
+                <div class="player-container">
+                    <iframe id="playerFrame" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="player-controls">
+                    <div class="channel-info">
+                        <div class="channel-logo" id="currentChannelLogo">TV</div>
+                        <div class="channel-details">
+                            <h3 id="currentChannelName">Entertainment Central</h3>
+                            <p id="currentChannelCategory">Entertainment • Live Now</p>
+                        </div>
+                    </div>
+                    <div class="player-buttons">
+                        <button class="player-btn" id="fullscreenBtn">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="player-btn" id="volumeBtn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <button class="player-btn" id="settingsBtn">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Guide -->
+            <section class="channel-guide">
+                <div class="guide-header">
+                    <h2 class="guide-title">Channel Guide</h2>
+                    <div class="guide-filter">
+                        <button class="filter-btn active" data-category="all">All</button>
+                        <button class="filter-btn" data-category="entertainment">Entertainment</button>
+                        <button class="filter-btn" data-category="sports">Sports</button>
+                        <button class="filter-btn" data-category="news">News</button>
+                        <button class="filter-btn" data-category="movies">Movies</button>
+                        <button class="filter-btn" data-category="kids">Kids</button>
+                    </div>
+                </div>
+                <div class="channels-grid" id="channelsGrid">
+                    <!-- Channels will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Now Playing -->
+            <section class="now-playing">
+                <div class="now-playing-header">
+                    <h2 class="now-playing-title">Today's Schedule</h2>
+                    <div class="schedule-nav">
+                        <button class="schedule-btn"><i class="fas fa-chevron-left"></i></button>
+                        <button class="schedule-btn"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="schedule-list" id="scheduleList">
+                    <!-- Schedule items will be dynamically added here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 StreamTV. All rights reserved. This is a demo website for educational purposes.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
