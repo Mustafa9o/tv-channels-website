@@ -5,7 +5,723 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamTV - Watch Live Channels</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #e50914;
+            --secondary: #141414;
+            --accent: #f5c518;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1593784991095-a205069470b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 8px 15px;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            background: rgba(255, 255, 255, 0.2);
+            width: 350px;
+        }
+
+        .search-bar input {
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            width: 100%;
+            padding: 5px;
+            font-size: 1rem;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-bar i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: rgba(20, 20, 20, 0.8);
+            padding: 2rem 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(229, 9, 20, 0.2);
+            color: white;
+            border-left: 3px solid var(--primary);
+        }
+
+        .sidebar-menu i {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Video Player */
+        .video-player {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .player-controls {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .channel-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .channel-details h3 {
+            margin-bottom: 5px;
+        }
+
+        .channel-details p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .player-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .player-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .player-btn:hover {
+            background: var(--primary);
+        }
+
+        /* Channel Guide */
+        .channel-guide {
+            margin-top: 2rem;
+        }
+
+        .guide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .guide-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .guide-filter {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary);
+        }
+
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .channel-card {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .channel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+
+        .channel-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.5);
+        }
+
+        .channel-preview {
+            height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .channel-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .channel-live {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .channel-live::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .channel-card-content {
+            padding: 15px;
+        }
+
+        .channel-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .channel-category {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        /* Now Playing */
+        .now-playing {
+            margin-top: 2rem;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .now-playing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .now-playing-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .schedule-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .schedule-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .schedule-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .schedule-item {
+            background: rgba(20, 20, 20, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .schedule-time {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .schedule-program {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .schedule-description {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .section-subtitle {
+            color: #aaa;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        /* Content Cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .content-card {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+
+        .content-image {
+            height: 150px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .content-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .content-details {
+            padding: 15px;
+        }
+
+        .content-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .content-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .content-description {
+            color: #ddd;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .content-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .content-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .content-btn:hover {
+            background: var(--secondary);
+        }
+
+        .content-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .content-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Settings Form */
+        .settings-form {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.3);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 2rem;
+        }
+
+        .form-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .form-btn.primary:hover {
+            background: var(--secondary);
+        }
+
+        .form-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #aaa;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: #0a0a0a;
+            color: #aaa;
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .channels-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+
+            .search-bar:focus-within {
+                width: 100%;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .content {
+                order: 1;
+            }
+
+            .channels-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .channels-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .schedule-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -32,76 +748,210 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <ul class="sidebar-menu">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#"><i class="fas fa-fire"></i> Trending</a></li>
-                <li><a href="#"><i class="fas fa-star"></i> Favorites</a></li>
-                <li><a href="#"><i class="fas fa-history"></i> Recently Watched</a></li>
-                <li><a href="#"><i class="fas fa-film"></i> Movies</a></li>
-                <li><a href="#"><i class="fas fa-football-ball"></i> Sports</a></li>
-                <li><a href="#"><i class="fas fa-newspaper"></i> News</a></li>
-                <li><a href="#"><i class="fas fa-child"></i> Kids</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#" data-section="home" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" data-section="trending"><i class="fas fa-fire"></i> Trending</a></li>
+                <li><a href="#" data-section="favorites"><i class="fas fa-star"></i> Favorites</a></li>
+                <li><a href="#" data-section="recent"><i class="fas fa-history"></i> Recently Watched</a></li>
+                <li><a href="#" data-section="movies"><i class="fas fa-film"></i> Movies</a></li>
+                <li><a href="#" data-section="sports"><i class="fas fa-football-ball"></i> Sports</a></li>
+                <li><a href="#" data-section="news"><i class="fas fa-newspaper"></i> News</a></li>
+                <li><a href="#" data-section="kids"><i class="fas fa-child"></i> Kids</a></li>
+                <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
         </aside>
 
         <!-- Content Area -->
         <main class="content">
-            <!-- Video Player -->
-            <div class="video-player">
-                <div class="player-container">
-                    <iframe id="playerFrame" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-                <div class="player-controls">
-                    <div class="channel-info">
-                        <div class="channel-logo" id="currentChannelLogo">TV</div>
-                        <div class="channel-details">
-                            <h3 id="currentChannelName">Entertainment Central</h3>
-                            <p id="currentChannelCategory">Entertainment • Live Now</p>
+            <!-- Home Section -->
+            <section id="home" class="content-section active">
+                <!-- Video Player -->
+                <div class="video-player">
+                    <div class="player-container">
+                        <iframe id="playerFrame" src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="player-controls">
+                        <div class="channel-info">
+                            <div class="channel-logo" id="currentChannelLogo">TV</div>
+                            <div class="channel-details">
+                                <h3 id="currentChannelName">Entertainment Central</h3>
+                                <p id="currentChannelCategory">Entertainment • Live Now</p>
+                            </div>
+                        </div>
+                        <div class="player-buttons">
+                            <button class="player-btn" id="fullscreenBtn">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="player-btn" id="volumeBtn">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <button class="player-btn" id="settingsBtn">
+                                <i class="fas fa-cog"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="player-buttons">
-                        <button class="player-btn" id="fullscreenBtn">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                        <button class="player-btn" id="volumeBtn">
-                            <i class="fas fa-volume-up"></i>
-                        </button>
-                        <button class="player-btn" id="settingsBtn">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Channel Guide -->
-            <section class="channel-guide">
-                <div class="guide-header">
-                    <h2 class="guide-title">Channel Guide</h2>
-                    <div class="guide-filter">
-                        <button class="filter-btn active" data-category="all">All</button>
-                        <button class="filter-btn" data-category="entertainment">Entertainment</button>
-                        <button class="filter-btn" data-category="sports">Sports</button>
-                        <button class="filter-btn" data-category="news">News</button>
-                        <button class="filter-btn" data-category="movies">Movies</button>
-                        <button class="filter-btn" data-category="kids">Kids</button>
+                <!-- Channel Guide -->
+                <section class="channel-guide">
+                    <div class="guide-header">
+                        <h2 class="guide-title">Channel Guide</h2>
+                        <div class="guide-filter">
+                            <button class="filter-btn active" data-category="all">All</button>
+                            <button class="filter-btn" data-category="entertainment">Entertainment</button>
+                            <button class="filter-btn" data-category="sports">Sports</button>
+                            <button class="filter-btn" data-category="news">News</button>
+                            <button class="filter-btn" data-category="movies">Movies</button>
+                            <button class="filter-btn" data-category="kids">Kids</button>
+                        </div>
+                    </div>
+                    <div class="channels-grid" id="channelsGrid">
+                        <!-- Channels will be dynamically added here -->
+                    </div>
+                </section>
+
+                <!-- Now Playing -->
+                <section class="now-playing">
+                    <div class="now-playing-header">
+                        <h2 class="now-playing-title">Today's Schedule</h2>
+                        <div class="schedule-nav">
+                            <button class="schedule-btn"><i class="fas fa-chevron-left"></i></button>
+                            <button class="schedule-btn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="schedule-list" id="scheduleList">
+                        <!-- Schedule items will be dynamically added here -->
+                    </div>
+                </section>
+            </section>
+
+            <!-- Trending Section -->
+            <section id="trending" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Trending Now</h2>
+                        <p class="section-subtitle">Most popular channels and shows this week</p>
                     </div>
                 </div>
-                <div class="channels-grid" id="channelsGrid">
-                    <!-- Channels will be dynamically added here -->
+                <div class="content-grid" id="trendingGrid">
+                    <!-- Trending content will be dynamically added here -->
                 </div>
             </section>
 
-            <!-- Now Playing -->
-            <section class="now-playing">
-                <div class="now-playing-header">
-                    <h2 class="now-playing-title">Today's Schedule</h2>
-                    <div class="schedule-nav">
-                        <button class="schedule-btn"><i class="fas fa-chevron-left"></i></button>
-                        <button class="schedule-btn"><i class="fas fa-chevron-right"></i></button>
+            <!-- Favorites Section -->
+            <section id="favorites" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Your Favorites</h2>
+                        <p class="section-subtitle">Channels you've marked as favorites</p>
                     </div>
                 </div>
-                <div class="schedule-list" id="scheduleList">
-                    <!-- Schedule items will be dynamically added here -->
+                <div class="content-grid" id="favoritesGrid">
+                    <!-- Favorites content will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Recently Watched Section -->
+            <section id="recent" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Recently Watched</h2>
+                        <p class="section-subtitle">Channels you've watched recently</p>
+                    </div>
+                </div>
+                <div class="content-grid" id="recentGrid">
+                    <!-- Recently watched content will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Movies Section -->
+            <section id="movies" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Movies</h2>
+                        <p class="section-subtitle">Movie channels and on-demand content</p>
+                    </div>
+                </div>
+                <div class="content-grid" id="moviesGrid">
+                    <!-- Movies content will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Sports Section -->
+            <section id="sports" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Sports</h2>
+                        <p class="section-subtitle">Live sports and sports channels</p>
+                    </div>
+                </div>
+                <div class="content-grid" id="sportsGrid">
+                    <!-- Sports content will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- News Section -->
+            <section id="news" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">News</h2>
+                        <p class="section-subtitle">News channels and breaking stories</p>
+                    </div>
+                </div>
+                <div class="content-grid" id="newsGrid">
+                    <!-- News content will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Kids Section -->
+            <section id="kids" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Kids</h2>
+                        <p class="section-subtitle">Child-friendly channels and programs</p>
+                    </div>
+                </div>
+                <div class="content-grid" id="kidsGrid">
+                    <!-- Kids content will be dynamically added here -->
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Settings</h2>
+                        <p class="section-subtitle">Manage your account and preferences</p>
+                    </div>
+                </div>
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="form-control" value="user123">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" value="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="theme">Theme</label>
+                        <select id="theme" class="form-control">
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quality">Default Video Quality</label>
+                        <select id="quality" class="form-control">
+                            <option value="auto">Auto</option>
+                            <option value="1080p">1080p</option>
+                            <option value="720p">720p</option>
+                            <option value="480p">480p</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button class="form-btn primary">Save Changes</button>
+                        <button class="form-btn secondary">Cancel</button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -114,6 +964,393 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        // Sample channel data
+        const channels = [
+            {
+                id: 1,
+                name: "Entertainment Central",
+                category: "entertainment",
+                logo: "EC",
+                videoId: "jfKfPfyJRdk",
+                description: "Your go-to channel for the latest in entertainment, celebrity news, and lifestyle shows."
+            },
+            {
+                id: 2,
+                name: "Sports Network",
+                category: "sports",
+                logo: "SN",
+                videoId: "tgbNymZ7vqY",
+                description: "24/7 sports coverage including live matches, analysis, and sports documentaries."
+            },
+            {
+                id: 3,
+                name: "Global News",
+                category: "news",
+                logo: "GN",
+                videoId: "jNQXAC9IVRw",
+                description: "Breaking news from around the world with in-depth reporting and analysis."
+            },
+            {
+                id: 4,
+                name: "Movie Mania",
+                category: "movies",
+                logo: "MM",
+                videoId: "dQw4w9WgXcQ",
+                description: "Blockbuster movies 24/7. From classics to the latest releases, we've got it all."
+            },
+            {
+                id: 5,
+                name: "Kids Universe",
+                category: "kids",
+                logo: "KU",
+                videoId: "M7lc1UVf-VE",
+                description: "Educational and entertaining content for children of all ages."
+            },
+            {
+                id: 6,
+                name: "Comedy Central",
+                category: "entertainment",
+                logo: "CC",
+                videoId: "9bZkp7q19f0",
+                description: "Non-stop laughter with the best comedy shows, stand-up specials, and movies."
+            },
+            {
+                id: 7,
+                name: "Extreme Sports",
+                category: "sports",
+                logo: "ES",
+                videoId: "RgKAFK5djSk",
+                description: "Adrenaline-pumping action from the world of extreme sports."
+            },
+            {
+                id: 8,
+                name: "Documentary Plus",
+                category: "entertainment",
+                logo: "DP",
+                videoId: "hY7m5jjJ9mM",
+                description: "Explore the world through captivating documentaries on nature, science, and history."
+            },
+            {
+                id: 9,
+                name: "Tech Today",
+                category: "news",
+                logo: "TT",
+                videoId: "FkTWj5L-Xp0",
+                description: "Latest technology news, reviews, and insights from the tech world."
+            },
+            {
+                id: 10,
+                name: "Classic Movies",
+                category: "movies",
+                logo: "CM",
+                videoId: "oHg5SJYRHA0",
+                description: "Relive the golden era of cinema with timeless classic movies."
+            },
+            {
+                id: 11,
+                name: "Cartoon Network",
+                category: "kids",
+                logo: "CN",
+                videoId: "kJQP7kiw5Fk",
+                description: "Favorite cartoons and animated series for kids and the young at heart."
+            },
+            {
+                id: 12,
+                name: "Music TV",
+                category: "entertainment",
+                logo: "MT",
+                videoId: "ScMzIvxBSi4",
+                description: "Non-stop music videos, concerts, and music documentaries."
+            }
+        ];
+
+        // Sample schedule data
+        const schedule = [
+            { time: "08:00 AM", program: "Morning Show", description: "Start your day with news and entertainment" },
+            { time: "10:00 AM", program: "Talk Show", description: "Celebrity interviews and discussions" },
+            { time: "12:00 PM", program: "News Hour", description: "Latest news from around the world" },
+            { time: "02:00 PM", program: "Movie Time", description: "Blockbuster movie presentation" },
+            { time: "04:00 PM", program: "Kids Zone", description: "Fun and educational content for kids" },
+            { time: "06:00 PM", program: "Evening News", description: "Comprehensive news coverage" },
+            { time: "08:00 PM", program: "Prime Time", description: "Popular series and shows" },
+            { time: "10:00 PM", program: "Late Night", description: "Comedy and entertainment" }
+        ];
+
+        // Sample content for other sections
+        const trendingContent = [
+            { id: 1, title: "Entertainment Central", category: "Entertainment", views: "1.2M", description: "Most popular entertainment channel this week" },
+            { id: 2, title: "Sports Network", category: "Sports", views: "980K", description: "Live sports coverage" },
+            { id: 3, title: "Global News", category: "News", views: "850K", description: "Breaking news from around the world" },
+            { id: 4, title: "Movie Mania", category: "Movies", views: "720K", description: "Blockbuster movies 24/7" }
+        ];
+
+        const favoritesContent = [
+            { id: 1, title: "Entertainment Central", category: "Entertainment", description: "Your favorite entertainment channel" },
+            { id: 2, title: "Sports Network", category: "Sports", description: "Your favorite sports channel" },
+            { id: 3, title: "Kids Universe", category: "Kids", description: "Your favorite kids channel" }
+        ];
+
+        const recentContent = [
+            { id: 1, title: "Entertainment Central", category: "Entertainment", watched: "2 hours ago", description: "Celebrity news and lifestyle shows" },
+            { id: 2, title: "Sports Network", category: "Sports", watched: "Yesterday", description: "Live sports coverage" },
+            { id: 3, title: "Global News", category: "News", watched: "2 days ago", description: "Breaking news from around the world" }
+        ];
+
+        const moviesContent = [
+            { id: 1, title: "Movie Mania", category: "Movies", year: "2023", description: "Blockbuster movies 24/7" },
+            { id: 2, title: "Classic Movies", category: "Movies", year: "Classic", description: "Timeless classic movies" },
+            { id: 3, title: "Action Movies", category: "Movies", year: "2023", description: "Non-stop action movies" }
+        ];
+
+        const sportsContent = [
+            { id: 1, title: "Sports Network", category: "Sports", live: true, description: "24/7 sports coverage" },
+            { id: 2, title: "Extreme Sports", category: "Sports", live: true, description: "Adrenaline-pumping action" },
+            { id: 3, title: "Football Channel", category: "Sports", live: false, description: "All football, all the time" }
+        ];
+
+        const newsContent = [
+            { id: 1, title: "Global News", category: "News", breaking: true, description: "Breaking news from around the world" },
+            { id: 2, title: "Tech Today", category: "News", breaking: false, description: "Latest technology news" },
+            { id: 3, title: "Business News", category: "News", breaking: false, description: "Business and financial news" }
+        ];
+
+        const kidsContent = [
+            { id: 1, title: "Kids Universe", category: "Kids", age: "3-8", description: "Educational and entertaining content" },
+            { id: 2, title: "Cartoon Network", category: "Kids", age: "6-12", description: "Favorite cartoons and animated series" },
+            { id: 3, title: "Kids Learning", category: "Kids", age: "5-10", description: "Educational programs for kids" }
+        ];
+
+        // DOM elements
+        const channelsGrid = document.getElementById('channelsGrid');
+        const scheduleList = document.getElementById('scheduleList');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const playerFrame = document.getElementById('playerFrame');
+        const currentChannelLogo = document.getElementById('currentChannelLogo');
+        const currentChannelName = document.getElementById('currentChannelName');
+        const currentChannelCategory = document.getElementById('currentChannelCategory');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        // Current channel
+        let currentChannel = channels[0];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            displayChannels(channels);
+            displaySchedule(schedule);
+            displayContent('trendingGrid', trendingContent);
+            displayContent('favoritesGrid', favoritesContent);
+            displayContent('recentGrid', recentContent);
+            displayContent('moviesGrid', moviesContent);
+            displayContent('sportsGrid', sportsContent);
+            displayContent('newsGrid', newsContent);
+            displayContent('kidsGrid', kidsContent);
+            
+            // Sidebar navigation
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Update active link
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    // Show corresponding section
+                    const sectionId = link.getAttribute('data-section');
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+            
+            // Filter button event listeners
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Filter channels
+                    const category = button.getAttribute('data-category');
+                    if (category === 'all') {
+                        displayChannels(channels);
+                    } else {
+                        const filtered = channels.filter(channel => channel.category === category);
+                        displayChannels(filtered);
+                    }
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filtered = channels.filter(channel => 
+                    channel.name.toLowerCase().includes(searchTerm) || 
+                    channel.description.toLowerCase().includes(searchTerm)
+                );
+                displayChannels(filtered);
+            });
+
+            // Player controls
+            fullscreenBtn.addEventListener('click', () => {
+                if (playerFrame.requestFullscreen) {
+                    playerFrame.requestFullscreen();
+                } else if (playerFrame.webkitRequestFullscreen) { /* Safari */
+                    playerFrame.webkitRequestFullscreen();
+                } else if (playerFrame.msRequestFullscreen) { /* IE11 */
+                    playerFrame.msRequestFullscreen();
+                }
+            });
+
+            volumeBtn.addEventListener('click', () => {
+                const icon = volumeBtn.querySelector('i');
+                if (icon.classList.contains('fa-volume-up')) {
+                    icon.classList.remove('fa-volume-up');
+                    icon.classList.add('fa-volume-mute');
+                    playerFrame.muted = true;
+                } else {
+                    icon.classList.remove('fa-volume-mute');
+                    icon.classList.add('fa-volume-up');
+                    playerFrame.muted = false;
+                }
+            });
+
+            settingsBtn.addEventListener('click', () => {
+                alert('Settings panel would open here in a real application');
+            });
+        });
+
+        // Function to display channels
+        function displayChannels(channelsToDisplay) {
+            channelsGrid.innerHTML = '';
+            
+            if (channelsToDisplay.length === 0) {
+                channelsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem; font-size: 1.2rem;">No channels found. Try a different search or filter.</p>';
+                return;
+            }
+            
+            channelsToDisplay.forEach(channel => {
+                const channelCard = document.createElement('div');
+                channelCard.className = 'channel-card';
+                if (channel.id === currentChannel.id) {
+                    channelCard.classList.add('active');
+                }
+                
+                channelCard.innerHTML = `
+                    <div class="channel-preview">
+                        <img src="https://picsum.photos/seed/${channel.name}/300/200.jpg" alt="${channel.name}">
+                        <div class="channel-live">LIVE</div>
+                    </div>
+                    <div class="channel-card-content">
+                        <div class="channel-name">${channel.name}</div>
+                        <div class="channel-category">${channel.category.charAt(0).toUpperCase() + channel.category.slice(1)}</div>
+                    </div>
+                `;
+                
+                channelCard.addEventListener('click', () => {
+                    // Update current channel
+                    currentChannel = channel;
+                    
+                    // Update player
+                    playerFrame.src = `https://www.youtube.com/embed/${channel.videoId}?autoplay=1&mute=1`;
+                    currentChannelLogo.textContent = channel.logo;
+                    currentChannelName.textContent = channel.name;
+                    currentChannelCategory.textContent = `${channel.category.charAt(0).toUpperCase() + channel.category.slice(1)} • Live Now`;
+                    
+                    // Update active card
+                    document.querySelectorAll('.channel-card').forEach(card => {
+                        card.classList.remove('active');
+                    });
+                    channelCard.classList.add('active');
+                    
+                    // Scroll to player
+                    document.querySelector('.video-player').scrollIntoView({ behavior: 'smooth' });
+                });
+                
+                channelsGrid.appendChild(channelCard);
+            });
+        }
+
+        // Function to display schedule
+        function displaySchedule(scheduleItems) {
+            scheduleList.innerHTML = '';
+            
+            scheduleItems.forEach(item => {
+                const scheduleItem = document.createElement('div');
+                scheduleItem.className = 'schedule-item';
+                scheduleItem.innerHTML = `
+                    <div class="schedule-time">${item.time}</div>
+                    <div class="schedule-program">${item.program}</div>
+                    <div class="schedule-description">${item.description}</div>
+                `;
+                scheduleList.appendChild(scheduleItem);
+            });
+        }
+
+        // Function to display content cards
+        function displayContent(gridId, contentItems) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            
+            if (contentItems.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No content found</h3>
+                        <p>Check back later for new content</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            contentItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                
+                let badge = '';
+                if (item.views) badge = `<span class="content-badge">${item.views} views</span>`;
+                if (item.watched) badge = `<span class="content-badge">Watched ${item.watched}</span>`;
+                if (item.year) badge = `<span class="content-badge">${item.year}</span>`;
+                if (item.live) badge = `<span class="content-badge">LIVE</span>`;
+                if (item.breaking) badge = `<span class="content-badge">BREAKING</span>`;
+                if (item.age) badge = `<span class="content-badge">Ages ${item.age}</span>`;
+                
+                let meta = '';
+                if (item.views) meta = `<span>${item.views} views</span>`;
+                if (item.watched) meta = `<span>Watched ${item.watched}</span>`;
+                if (item.year) meta = `<span>${item.year}</span>`;
+                if (item.live) meta = `<span><i class="fas fa-circle" style="color: red; font-size: 0.6rem;"></i> Live</span>`;
+                if (item.breaking) meta = `<span><i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Breaking</span>`;
+                if (item.age) meta = `<span>Ages ${item.age}</span>`;
+                
+                card.innerHTML = `
+                    <div class="content-image">
+                        <img src="https://picsum.photos/seed/${item.title}/300/200.jpg" alt="${item.title}">
+                        ${badge}
+                    </div>
+                    <div class="content-details">
+                        <h3 class="content-title">${item.title}</h3>
+                        <div class="content-meta">
+                            <span>${item.category}</span>
+                            ${meta}
+                        </div>
+                        <p class="content-description">${item.description}</p>
+                        <div class="content-actions">
+                            <button class="content-btn">Watch Now</button>
+                            <button class="content-btn secondary">More Info</button>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+    </script>
 </body>
 </html>
